@@ -11,6 +11,7 @@ export default class Logger {
             ...config
         });
         this.location = typeof window === 'undefined' ? {} : window.location;
+        this.URL = this.location.href;
     }
 }
 
@@ -20,7 +21,11 @@ export default class Logger {
  * @param {object} config Configuration
  */
 function matchesURL(hostname, config) {
-    return !!config.allowedHostnames.filter(URL => (URL.indexOf(hostname) > -1)).length;
+    const allowedHostnames = Array.isArray(config.allowedHostnames) ? config.allowedHostnames : [];
+    if (allowedHostnames.length === 0) {
+        return true;
+    }
+    return !!allowedHostnames.filter(URL => (URL.indexOf(hostname) > -1)).length;
 }
 
 /**
@@ -50,9 +55,10 @@ function hasOwn(object, key) {
  * @param {object} config Configuration
  */
 function matchesQueryParam(queryString, config) {
+    const allowedQueryStringParameters = Array.isArray(config.allowedQueryStringParameters) ? config.allowedQueryStringParameters : [];
     const allParams = getAllParams(queryString);
     const allowedParams = [];
-    config.allowedQueryStringParameters.forEach(param => {
+    allowedQueryStringParameters.forEach(param => {
         if (typeof param === 'string') {
             const [key, value = true] = param.split('=');
             allowedParams.push({ key, value });

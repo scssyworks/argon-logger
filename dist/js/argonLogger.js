@@ -130,10 +130,17 @@
       allowedQueryStringParameters: ['debug']
     }, config));
     this.location = typeof window === 'undefined' ? {} : window.location;
+    this.URL = this.location.href;
   };
 
   function matchesURL(hostname, config) {
-    return !!config.allowedHostnames.filter(function (URL) {
+    var allowedHostnames = Array.isArray(config.allowedHostnames) ? config.allowedHostnames : [];
+
+    if (allowedHostnames.length === 0) {
+      return true;
+    }
+
+    return !!allowedHostnames.filter(function (URL) {
       return URL.indexOf(hostname) > -1;
     }).length;
   }
@@ -177,9 +184,10 @@
 
 
   function matchesQueryParam(queryString, config) {
+    var allowedQueryStringParameters = Array.isArray(config.allowedQueryStringParameters) ? config.allowedQueryStringParameters : [];
     var allParams = getAllParams(queryString);
     var allowedParams = [];
-    config.allowedQueryStringParameters.forEach(function (param) {
+    allowedQueryStringParameters.forEach(function (param) {
       if (typeof param === 'string') {
         var _param$split = param.split('='),
             _param$split2 = _slicedToArray(_param$split, 2),
