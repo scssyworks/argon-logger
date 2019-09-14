@@ -1,5 +1,5 @@
-# Argon logger
-Argon logger is a simple console logging utility with options to enable and disable logs for different environments.
+# Argon logger [![Build Status](https://travis-ci.org/scssyworks/argon-logger.svg?branch=master)](https://travis-ci.org/scssyworks/argon-logger)
+Argon logger is a simple console logging utility with options to enable/disable logs as per given environment configuration. Argon logger extends the existing console API, therefore any changes to existing ``console`` object will reflect in argon logger too.
 
 # Installation
 
@@ -9,7 +9,7 @@ npm i argon-logger
 
 # How it works?
 
-Argon logger provide methods to generate console logs by extending the existing console API. Argon logger is simple to use
+Argon logger is simple to use.
 
 ## Without configuration
 
@@ -40,3 +40,7 @@ logger.log('Hello'); // Hello
 logger.warn('This is a warning'); // This is a warning
 ...
 ```
+
+# Disclaimer
+
+Argon logger doesn't have any major releases yet. It means it has potential to break in few scenarios. We need your contribution to make it better. Please email me at <a href="mailto:contactsachinsingh@gmail.com">contactsachinsingh@gmail.com</a> if you want to become a contributor.
