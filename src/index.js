@@ -91,7 +91,7 @@ if (typeof console !== 'undefined') {
             Logger.prototype[prop] = function (...args) {
                 if (
                     (matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config))
-                    && !this.disable
+                    && !this.config.disable
                 ) {
                     console[prop](...args);
                 }
