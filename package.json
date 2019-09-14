@@ -1,6 +1,6 @@
 {
   "name": "argon-logger",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Sample rollup app",
   "main": "dist/js/argonLogger",
   "module": "src/index.js",
