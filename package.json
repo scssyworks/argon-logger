@@ -11,6 +11,14 @@
   },
   "author": "Sachin Singh <contactsachinsingh@gmail.com>",
   "license": "MIT",
+  "keywords": [
+    "logger",
+    "console",
+    "logs",
+    "hide logs",
+    "logging",
+    "console api"
+  ],
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
