@@ -221,7 +221,7 @@
     Object.keys(console).forEach(function (prop) {
       if (typeof console[prop] === 'function') {
         Logger.prototype[prop] = function () {
-          if ((matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && !this.disable) {
+          if ((matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && !this.config.disable) {
             var _console;
 
             (_console = console)[prop].apply(_console, arguments);
