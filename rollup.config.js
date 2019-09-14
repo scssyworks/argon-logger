@@ -6,6 +6,15 @@ import json from "rollup-plugin-json";
 import { eslint } from 'rollup-plugin-eslint';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
+import pkg from './package.json';
+
+const banner = `/**!
+ * A simple console logging utility
+ * Released under MIT license
+ * @author Sachin Singh <contactsachinsingh@gmail.com>
+ * @version v${pkg.version}
+ * @license MIT
+ */`;
 
 const defaultConfig = {
     input: 'src/index.js',
@@ -13,7 +22,8 @@ const defaultConfig = {
         file: 'dist/js/argonLogger.js',
         format: 'umd',
         name: 'Logger',
-        sourcemap: true
+        sourcemap: true,
+        banner
     },
     plugins: [
         json({
