@@ -73,13 +73,13 @@ function matchesQueryParam(queryString, config) {
             allowedParams.push(param);
         }
     });
-    let result = true;
+    let result = false;
     allowedParams.forEach(param => {
         const currentResult = !!allParams.filter(queryParam => (
             param.key === queryParam.key
             && (param.value === queryParam.value || param.value === true)
         )).length;
-        result = result && currentResult;
+        result = result || currentResult;
     });
     return result;
 }

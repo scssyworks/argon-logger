@@ -206,12 +206,12 @@
         allowedParams.push(param);
       }
     });
-    var result = true;
+    var result = false;
     allowedParams.forEach(function (param) {
       var currentResult = !!allParams.filter(function (queryParam) {
         return param.key === queryParam.key && (param.value === queryParam.value || param.value === true);
       }).length;
-      result = result && currentResult;
+      result = result || currentResult;
     });
     return result;
   } // Extending current Logger class to include all console methods
