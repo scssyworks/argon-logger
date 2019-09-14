@@ -43,4 +43,4 @@ logger.warn('This is a warning'); // This is a warning
 
 # Disclaimer
 
-Argon logger doesn't have any major releases yet. It means it has potential to break in few scenarios. We need your contribution to make it better. Please email me at <a href="mailto:contactsachinsingh@gmail.com">contactsachinsingh@gmail.com</a> if you want to become a contributor.
+Argon logger doesn't have any major releases yet. It means it has potential to break in few scenarios. We need your contribution to make it better. Please email at <a href="mailto:contactsachinsingh@gmail.com">contactsachinsingh@gmail.com</a> if you want to become a contributor.
