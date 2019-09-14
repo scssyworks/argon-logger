@@ -4,6 +4,7 @@
   "description": "Sample rollup app",
   "main": "dist/js/argonLogger",
   "module": "src/index.js",
+  "types": "typings/argonLogger.d.ts",
   "scripts": {
     "start": "rollup -c --watch --environment SERVE:true",
     "build": "rollup -c"
