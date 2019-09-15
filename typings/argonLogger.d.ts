@@ -7,7 +7,8 @@ declare class Logger extends Console {
 declare namespace Logger {
     export interface LoggerConstructorOptions {
         allowedHostnames?: string[]
-        allowedQueryStringParameters?: string[]
+        allowedQueryStringParameters?: string[],
+        allowedPorts?: string[],
         disable?: boolean
     }
 }

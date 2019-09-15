@@ -134,7 +134,8 @@
     this.config = Object.freeze(_objectSpread2({
       allowedHostnames: ['localhost', '127.0.0.1', '0.0.0.0'],
       disable: false,
-      allowedQueryStringParameters: ['debug']
+      allowedQueryStringParameters: ['debug'],
+      allowedPorts: []
     }, config));
     this.location = typeof window === 'undefined' ? {} : window.location;
     this.URL = this.location.href;
@@ -150,6 +151,25 @@
     return !!allowedHostnames.filter(function (URL) {
       return URL.indexOf(hostname) > -1;
     }).length;
+  }
+  /**
+   * Checks if given port is allowed
+   * @param {string} port Current port
+   * @param {object} config Configuration
+   */
+
+
+  function matchesPort(port, config) {
+    var allowedPorts = Array.isArray(config.allowedPorts) ? config.allowedPorts : [];
+    allowedPorts = allowedPorts.map(function (port) {
+      return "".concat(port).trim();
+    });
+
+    if (allowedPorts.length === 0) {
+      return true;
+    }
+
+    return allowedPorts.indexOf(port) > -1;
   }
   /**
    * Returns a map of query string key value pairs
@@ -228,7 +248,7 @@
     Object.keys(console).forEach(function (prop) {
       if (typeof console[prop] === 'function') {
         Logger.prototype[prop] = function () {
-          if ((matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && !this.config.disable) {
+          if ((matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && matchesPort(this.location.port, this.config) && !this.config.disable) {
             var _console;
 
             (_console = console)[prop].apply(_console, arguments);
