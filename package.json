@@ -1,6 +1,6 @@
 {
   "name": "argon-logger",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A simple console logging utility",
   "main": "dist/js/argonLogger",
   "module": "src/index.js",
