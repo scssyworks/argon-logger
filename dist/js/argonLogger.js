@@ -31,6 +31,22 @@
     }
   }
 
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
   function _defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
@@ -123,24 +139,10 @@
   }
 
   /**
-   * Logger class
-   * @class
+   * Tests if current host name matches allowed hostnames
+   * @param {string} hostname Current hostname
+   * @param {object} config Configuration
    */
-  var Logger = function Logger() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Logger);
-
-    this.config = Object.freeze(_objectSpread2({
-      allowedHostnames: ['localhost', '127.0.0.1', '0.0.0.0'],
-      disable: false,
-      allowedQueryStringParameters: ['debug'],
-      allowedPorts: []
-    }, config));
-    this.location = typeof window === 'undefined' ? {} : window.location;
-    this.URL = this.location.href;
-  };
-
   function matchesURL(hostname, config) {
     var allowedHostnames = Array.isArray(config.allowedHostnames) ? config.allowedHostnames : [];
 
@@ -241,24 +243,246 @@
       result = result || currentResult;
     });
     return result;
-  } // Extending current Logger class to include all console methods
-
-
-  if (typeof console !== 'undefined') {
-    Object.keys(console).forEach(function (prop) {
-      if (typeof console[prop] === 'function') {
-        Logger.prototype[prop] = function () {
-          if ((matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && matchesPort(this.location.port, this.config) && !this.config.disable) {
-            var _console;
-
-            (_console = console)[prop].apply(_console, arguments);
-          }
-        };
-      } else {
-        Logger.prototype[prop] = console[prop];
-      }
-    });
   }
+  /**
+   * Returns true if logging should allowed
+   */
+
+
+  function _isLoggingAllowed() {
+    return typeof console !== 'undefined' && (matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && matchesPort(this.location.port, this.config) && !this.config.disable;
+  }
+  /**
+   * Logger class
+   * @class
+   */
+
+
+  var Logger =
+  /*#__PURE__*/
+  function () {
+    function Logger() {
+      var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, Logger);
+
+      this.config = Object.freeze(_objectSpread2({
+        allowedHostnames: ['localhost', '127.0.0.1', '0.0.0.0'],
+        disable: false,
+        allowedQueryStringParameters: ['debug'],
+        allowedPorts: []
+      }, config));
+      this.location = typeof window === 'undefined' ? {} : window.location;
+      this.URL = this.location.href;
+    }
+
+    _createClass(Logger, [{
+      key: "isLoggingAllowed",
+      value: function isLoggingAllowed() {
+        return _isLoggingAllowed.apply(this);
+      }
+    }, {
+      key: "log",
+      value: function log() {
+        if (this.isLoggingAllowed() && console.log) {
+          var _console;
+
+          return (_console = console).log.apply(_console, arguments);
+        }
+      }
+    }, {
+      key: "warn",
+      value: function warn() {
+        if (this.isLoggingAllowed() && console.warn) {
+          var _console2;
+
+          (_console2 = console).warn.apply(_console2, arguments);
+        }
+      }
+    }, {
+      key: "debug",
+      value: function debug() {
+        if (this.isLoggingAllowed() && console.debug) {
+          var _console3;
+
+          (_console3 = console).debug.apply(_console3, arguments);
+        }
+      }
+    }, {
+      key: "error",
+      value: function error() {
+        if (this.isLoggingAllowed() && console.error) {
+          var _console4;
+
+          (_console4 = console).error.apply(_console4, arguments);
+        }
+      }
+    }, {
+      key: "info",
+      value: function info() {
+        if (this.isLoggingAllowed() && console.info) {
+          var _console5;
+
+          (_console5 = console).info.apply(_console5, arguments);
+        }
+      }
+    }, {
+      key: "dir",
+      value: function dir() {
+        if (this.isLoggingAllowed() && console.dir) {
+          var _console6;
+
+          (_console6 = console).dir.apply(_console6, arguments);
+        }
+      }
+    }, {
+      key: "dirxml",
+      value: function dirxml() {
+        if (this.isLoggingAllowed() && console.dirxml) {
+          var _console7;
+
+          (_console7 = console).dirxml.apply(_console7, arguments);
+        }
+      }
+    }, {
+      key: "table",
+      value: function table() {
+        if (this.isLoggingAllowed() && console.table) {
+          var _console8;
+
+          (_console8 = console).table.apply(_console8, arguments);
+        }
+      }
+    }, {
+      key: "trace",
+      value: function trace() {
+        if (this.isLoggingAllowed() && console.trace) {
+          var _console9;
+
+          (_console9 = console).trace.apply(_console9, arguments);
+        }
+      }
+    }, {
+      key: "group",
+      value: function group() {
+        if (this.isLoggingAllowed() && console.group) {
+          var _console10;
+
+          (_console10 = console).group.apply(_console10, arguments);
+        }
+      }
+    }, {
+      key: "groupCollapsed",
+      value: function groupCollapsed() {
+        if (this.isLoggingAllowed() && console.groupCollapsed) {
+          var _console11;
+
+          (_console11 = console).groupCollapsed.apply(_console11, arguments);
+        }
+      }
+    }, {
+      key: "groupEnd",
+      value: function groupEnd() {
+        if (this.isLoggingAllowed() && console.groupEnd) {
+          var _console12;
+
+          (_console12 = console).groupEnd.apply(_console12, arguments);
+        }
+      }
+    }, {
+      key: "clear",
+      value: function clear() {
+        if (this.isLoggingAllowed() && console.clear) {
+          var _console13;
+
+          (_console13 = console).clear.apply(_console13, arguments);
+        }
+      }
+    }, {
+      key: "count",
+      value: function count() {
+        if (this.isLoggingAllowed() && console.count) {
+          var _console14;
+
+          (_console14 = console).count.apply(_console14, arguments);
+        }
+      }
+    }, {
+      key: "countReset",
+      value: function countReset() {
+        if (this.isLoggingAllowed() && console.countReset) {
+          var _console15;
+
+          (_console15 = console).countReset.apply(_console15, arguments);
+        }
+      }
+    }, {
+      key: "assert",
+      value: function assert() {
+        if (this.isLoggingAllowed() && console.assert) {
+          var _console16;
+
+          (_console16 = console).assert.apply(_console16, arguments);
+        }
+      }
+    }, {
+      key: "profile",
+      value: function profile() {
+        if (this.isLoggingAllowed() && console.profile) {
+          var _console17;
+
+          (_console17 = console).profile.apply(_console17, arguments);
+        }
+      }
+    }, {
+      key: "profileEnd",
+      value: function profileEnd() {
+        if (this.isLoggingAllowed() && console.profileEnd) {
+          var _console18;
+
+          (_console18 = console).profileEnd.apply(_console18, arguments);
+        }
+      }
+    }, {
+      key: "time",
+      value: function time() {
+        if (this.isLoggingAllowed() && console.time) {
+          var _console19;
+
+          (_console19 = console).time.apply(_console19, arguments);
+        }
+      }
+    }, {
+      key: "timeLog",
+      value: function timeLog() {
+        if (this.isLoggingAllowed() && console.timeLog) {
+          var _console20;
+
+          (_console20 = console).timeLog.apply(_console20, arguments);
+        }
+      }
+    }, {
+      key: "timeStamp",
+      value: function timeStamp() {
+        if (this.isLoggingAllowed() && console.timeStamp) {
+          var _console21;
+
+          (_console21 = console).timeStamp.apply(_console21, arguments);
+        }
+      }
+    }, {
+      key: "context",
+      value: function context() {
+        if (this.isLoggingAllowed() && console.context) {
+          var _console22;
+
+          (_console22 = console).context.apply(_console22, arguments);
+        }
+      }
+    }]);
+
+    return Logger;
+  }();
 
   return Logger;
 
