@@ -2,6 +2,7 @@ declare class Logger {
     constructor(config?: Logger.LoggerConstructorOptions);
     URL: string;
     location: object;
+    isLoggingAllowed(): boolean;
     debug(...args: any): any;
     error(...args: any): any;
     info(...args: any): any;
