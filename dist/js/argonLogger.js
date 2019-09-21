@@ -2,7 +2,7 @@
  * A simple console logging utility
  * Released under MIT license
  * @author Sachin Singh <contactsachinsingh@gmail.com>
- * @version v0.0.7
+ * @version v0.0.9
  * @license MIT
  */
 (function (global, factory) {
@@ -250,7 +250,11 @@
 
 
   function _isLoggingAllowed() {
-    return typeof console !== 'undefined' && (matchesURL(this.location.hostname, this.config) || matchesQueryParam(this.location.search, this.config)) && matchesPort(this.location.port, this.config) && !this.config.disable;
+    if (typeof this.config.test === 'function') {
+      return this.config.test();
+    }
+
+    return typeof console !== 'undefined' && (matchesURL(this.location.hostname, this.config) && matchesPort(this.location.port, this.config) || matchesQueryParam(this.location.search, this.config)) && !this.config.disable;
   }
   /**
    * Logger class

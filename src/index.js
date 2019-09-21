@@ -85,12 +85,18 @@ function matchesQueryParam(queryString, config) {
  * Returns true if logging should allowed
  */
 function isLoggingAllowed() {
+    if (typeof this.config.test === 'function') {
+        return this.config.test();
+    }
     return (
         (typeof console !== 'undefined')
         && (
-            matchesURL(this.location.hostname, this.config)
+            (
+                matchesURL(this.location.hostname, this.config)
+                && matchesPort(this.location.port, this.config)
+            )
             || matchesQueryParam(this.location.search, this.config)
-        ) && matchesPort(this.location.port, this.config)
+        )
         && !this.config.disable
     );
 }
