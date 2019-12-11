@@ -2,14 +2,14 @@
  * A simple console logging utility
  * Released under MIT license
  * @author Sachin Singh <contactsachinsingh@gmail.com>
- * @version v0.1.0
+ * @version v0.1.1
  * @license MIT
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global.Logger = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -81,13 +81,13 @@
       var source = arguments[i] != null ? arguments[i] : {};
 
       if (i % 2) {
-        ownKeys(source, true).forEach(function (key) {
+        ownKeys(Object(source), true).forEach(function (key) {
           _defineProperty(target, key, source[key]);
         });
       } else if (Object.getOwnPropertyDescriptors) {
         Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
       } else {
-        ownKeys(source).forEach(function (key) {
+        ownKeys(Object(source)).forEach(function (key) {
           Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
         });
       }
@@ -230,10 +230,10 @@
         });
       } else if (param && _typeof(param) === 'object' && hasOwn(param, 'key') && hasOwn(param, 'value') // Schema check
       ) {
-        param.key = param.key.trim();
-        param.value = "".concat(param.value).trim();
-        allowedParams.push(param);
-      }
+          param.key = param.key.trim();
+          param.value = "".concat(param.value).trim();
+          allowedParams.push(param);
+        }
     });
     var result = false;
     allowedParams.forEach(function (param) {
@@ -490,5 +490,5 @@
 
   return Logger;
 
-}));
+})));
 //# sourceMappingURL=argonLogger.js.map
