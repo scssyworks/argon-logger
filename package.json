@@ -3,7 +3,6 @@
   "version": "0.1.2",
   "description": "A simple console logging utility",
   "main": "dist/js/argonLogger",
-  "module": "src/index.js",
   "types": "typings/argonLogger.d.ts",
   "scripts": {
     "start": "rollup -c --watch --environment SERVE:true",
