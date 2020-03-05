@@ -34,8 +34,9 @@ const logger = new Logger({
     allowedHostnames: ['google.com'], // List of hostnames allowed. Set this to an empty array to allow logs everywhere.
     allowedQueryStringParameters: ['debug=true'], // List of query string parameters for which logs should be generated.
     allowedPorts: [], // List of ports for which logging should be enabled
-    test: () => { ... }, // A test function for full flexibility on customizing where to hide the logs
+    test: (...logArguments) => { ... }, // A test function for full flexibility on customizing where to hide the logs
                          // A test function overrides existing filters.
+    prefixes: [], // Array of strings to be prepended automatically before each log.
     disable: false // If set to "true" disables the logging completely. The remaining two parameters are ignored.
 });
 
@@ -46,4 +47,4 @@ logger.warn('This is a warning'); // This is a warning
 
 # Disclaimer
 
-Argon logger doesn't have any major releases yet. It means it has potential to break in few scenarios. We need your contribution to make it better. Please email at <a href="mailto:contactsachinsingh@gmail.com">contactsachinsingh@gmail.com</a> if you want to become a contributor.
+Argon logger doesn't have any major releases yet. Your contribution can help us improve this project. Let us know if you have any suggestions for improvements and features.
