@@ -2,7 +2,7 @@ declare class Logger {
     constructor(config?: Logger.LoggerConstructorOptions);
     URL: string;
     location: object;
-    isLoggingAllowed(): boolean;
+    isLoggingAllowed(args: any[]): boolean;
     debug(...args: any): any;
     error(...args: any): any;
     info(...args: any): any;
@@ -33,7 +33,8 @@ declare namespace Logger {
         allowedHostnames?: string[]
         allowedQueryStringParameters?: string[],
         allowedPorts?: string[],
-        disable?: boolean
+        disable?: boolean,
+        prefixes?: string[]
     }
 }
 

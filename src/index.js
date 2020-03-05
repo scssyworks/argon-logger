@@ -84,9 +84,9 @@ function matchesQueryParam(queryString, config) {
 /**
  * Returns true if logging should allowed
  */
-function isLoggingAllowed() {
+function isLoggingAllowed(...args) {
     if (typeof this.config.test === 'function') {
-        return this.config.test();
+        return this.config.test.apply(this.config, args);
     }
     return (
         (typeof console !== 'undefined')
@@ -112,122 +112,145 @@ export default class Logger {
             disable: false,
             allowedQueryStringParameters: ['debug'],
             allowedPorts: [],
+            prefixes: [],
             ...config
         });
         this.location = typeof window === 'undefined' ? {} : window.location;
         this.URL = this.location.href;
     }
-    isLoggingAllowed() {
-        return isLoggingAllowed.apply(this);
+    isLoggingAllowed(args) {
+        return isLoggingAllowed.apply(this, args);
     }
     log() {
-        if (this.isLoggingAllowed() && console.log) {
-            return console.log(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.log) {
+            return console.log(...args);
         }
     }
     warn() {
-        if (this.isLoggingAllowed() && console.warn) {
-            console.warn(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.warn) {
+            console.warn(...args);
         }
     }
     debug() {
-        if (this.isLoggingAllowed() && console.debug) {
-            console.debug(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.debug) {
+            console.debug(...args);
         }
     }
     error() {
-        if (this.isLoggingAllowed() && console.error) {
-            console.error(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.error) {
+            console.error(...args);
         }
     }
     info() {
-        if (this.isLoggingAllowed() && console.info) {
-            console.info(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.info) {
+            console.info(...args);
         }
     }
     dir() {
-        if (this.isLoggingAllowed() && console.dir) {
-            console.dir(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.dir) {
+            console.dir(...args);
         }
     }
     dirxml() {
-        if (this.isLoggingAllowed() && console.dirxml) {
-            console.dirxml(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.dirxml) {
+            console.dirxml(...args);
         }
     }
     table() {
-        if (this.isLoggingAllowed() && console.table) {
-            console.table(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.table) {
+            console.table(...args);
         }
     }
     trace() {
-        if (this.isLoggingAllowed() && console.trace) {
-            console.trace(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.trace) {
+            console.trace(...args);
         }
     }
     group() {
-        if (this.isLoggingAllowed() && console.group) {
-            console.group(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.group) {
+            console.group(...args);
         }
     }
     groupCollapsed() {
-        if (this.isLoggingAllowed() && console.groupCollapsed) {
-            console.groupCollapsed(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.groupCollapsed) {
+            console.groupCollapsed(...args);
         }
     }
     groupEnd() {
-        if (this.isLoggingAllowed() && console.groupEnd) {
-            console.groupEnd(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.groupEnd) {
+            console.groupEnd(...args);
         }
     }
     clear() {
-        if (this.isLoggingAllowed() && console.clear) {
-            console.clear(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.clear) {
+            console.clear(...args);
         }
     }
     count() {
-        if (this.isLoggingAllowed() && console.count) {
-            console.count(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.count) {
+            console.count(...args);
         }
     }
     countReset() {
-        if (this.isLoggingAllowed() && console.countReset) {
-            console.countReset(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.countReset) {
+            console.countReset(...args);
         }
     }
     assert() {
-        if (this.isLoggingAllowed() && console.assert) {
-            console.assert(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.assert) {
+            console.assert(...args);
         }
     }
     profile() {
-        if (this.isLoggingAllowed() && console.profile) {
-            console.profile(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.profile) {
+            console.profile(...args);
         }
     }
     profileEnd() {
-        if (this.isLoggingAllowed() && console.profileEnd) {
-            console.profileEnd(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.profileEnd) {
+            console.profileEnd(...args);
         }
     }
     time() {
+        const args = [...this.config.prefixes, ...arguments];
         if (this.isLoggingAllowed() && console.time) {
-            console.time(...arguments);
+            console.time(...args);
         }
     }
     timeLog() {
-        if (this.isLoggingAllowed() && console.timeLog) {
-            console.timeLog(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.timeLog) {
+            console.timeLog(...args);
         }
     }
     timeStamp() {
-        if (this.isLoggingAllowed() && console.timeStamp) {
-            console.timeStamp(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.timeStamp) {
+            console.timeStamp(...args);
         }
     }
     context() {
-        if (this.isLoggingAllowed() && console.context) {
-            console.context(...arguments);
+        const args = [...this.config.prefixes, ...arguments];
+        if (this.isLoggingAllowed(args) && console.context) {
+            console.context(...args);
         }
     }
 }
