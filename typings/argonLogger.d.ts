@@ -38,4 +38,4 @@ declare namespace Logger {
     }
 }
 
-export = Logger;
+export default Logger;
