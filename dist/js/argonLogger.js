@@ -2,7 +2,7 @@
  * A simple console logging utility
  * Released under MIT license
  * @author Sachin Singh <contactsachinsingh@gmail.com>
- * @version v0.2.1
+ * @version v0.3.0
  * @license MIT
  */
 (function (global, factory) {
