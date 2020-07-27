@@ -221,10 +221,7 @@
     var args = toArr(arguments);
     var fn = args.splice(0, 1)[0];
     var prefixes = this.config.prefixes;
-
-    while (prefixes.length) {
-      args.unshift(prefixes.pop());
-    }
+    args = prefixes.concat(args);
 
     if (this.isLoggingAllowed(args) && console[fn]) {
       var c;
