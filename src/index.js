@@ -1,14 +1,15 @@
+import './polyfills/includes';
+import './polyfills/find';
+import { isArr, toArr, assign } from './utils';
+
 /**
  * Tests if current host name matches allowed hostnames
  * @param {string} hostname Current hostname
  * @param {object} config Configuration
  */
 function matchesURL(hostname, config) {
-    const allowedHostnames = Array.isArray(config.allowedHostnames) ? config.allowedHostnames : [];
-    if (allowedHostnames.length === 0) {
-        return true;
-    }
-    return !!allowedHostnames.filter(URL => (URL.indexOf(hostname) > -1)).length;
+    const allowedHostnames = isArr(config.allowedHostnames) ? config.allowedHostnames : [];
+    return (allowedHostnames.length === 0 || !!allowedHostnames.find(URL => (URL.includes(hostname))));
 }
 
 /**
@@ -17,12 +18,9 @@ function matchesURL(hostname, config) {
  * @param {object} config Configuration
  */
 function matchesPort(port, config) {
-    let allowedPorts = Array.isArray(config.allowedPorts) ? config.allowedPorts : [];
+    let allowedPorts = isArr(config.allowedPorts) ? config.allowedPorts : [];
     allowedPorts = allowedPorts.map(port => (`${port}`).trim());
-    if (allowedPorts.length === 0) {
-        return true;
-    }
-    return (allowedPorts.indexOf(port) > -1);
+    return (allowedPorts.length === 0 || allowedPorts.includes(port));
 }
 
 /**
@@ -30,10 +28,10 @@ function matchesPort(port, config) {
  * @param {string} queryString Current query string
  */
 function getAllParams(queryString) {
-    queryString = queryString.substring(queryString.charAt(0) === '?' ? 1 : 0);
-    return queryString.split('&').map((pairs) => {
-        const [key, value] = pairs.split('=').map(part => decodeURIComponent(part).trim());
-        return { key, value };
+    queryString = queryString.substring(queryString.charAt(0) === '?');
+    return queryString.split('&').map(pairs => {
+        const pair = pairs.split('=').map(part => decodeURIComponent(part).trim());
+        return { key: pair[0], value: pair[1] };
     });
 }
 
@@ -52,13 +50,13 @@ function hasOwn(object, key) {
  * @param {object} config Configuration
  */
 function matchesQueryParam(queryString, config) {
-    const allowedQueryStringParameters = Array.isArray(config.allowedQueryStringParameters) ? config.allowedQueryStringParameters : [];
+    const allowedQueryStringParameters = isArr(config.allowedQueryStringParameters) ? config.allowedQueryStringParameters : [];
     const allParams = getAllParams(queryString);
     const allowedParams = [];
     allowedQueryStringParameters.forEach(param => {
         if (typeof param === 'string') {
-            const [key, value = true] = param.split('=');
-            allowedParams.push({ key, value });
+            const pair = param.split('=');
+            allowedParams.push({ key: pair[0], value: typeof pair[1] === 'undefined' ? true : pair[1] });
         } else if (
             param
             && typeof param === 'object'
@@ -72,10 +70,10 @@ function matchesQueryParam(queryString, config) {
     });
     let result = false;
     allowedParams.forEach(param => {
-        const currentResult = !!allParams.filter(queryParam => (
+        const currentResult = !!allParams.find(queryParam => (
             param.key === queryParam.key
             && (param.value === queryParam.value || param.value === true)
-        )).length;
+        ));
         result = result || currentResult;
     });
     return result;
@@ -84,21 +82,47 @@ function matchesQueryParam(queryString, config) {
 /**
  * Returns true if logging should allowed
  */
-function isLoggingAllowed(...args) {
-    if (typeof this.config.test === 'function') {
-        return this.config.test.apply(this.config, args);
+function isLoggingAllowed() {
+    const test = this.config.test;
+    const disable = this.config.disable;
+    const location = this.location;
+    if (typeof test === 'function') {
+        return test.apply(this.config, arguments);
     }
     return (
         (typeof console !== 'undefined')
         && (
             (
-                matchesURL(this.location.hostname, this.config)
-                && matchesPort(this.location.port, this.config)
+                matchesURL(location.hostname, this.config)
+                && matchesPort(location.port, this.config)
             )
-            || matchesQueryParam(this.location.search, this.config)
+            || matchesQueryParam(location.search, this.config)
         )
-        && !this.config.disable
+        && !disable
     );
+}
+
+function rewireFunc() {
+    const args = toArr(arguments);
+    const fn = args.splice(0, 1)[0];
+    const prefixes = this.config.prefixes;
+    while (prefixes.length) {
+        args.unshift(prefixes.pop());
+    }
+    if (this.isLoggingAllowed(args) && console[fn]) {
+        let c;
+        return (c = console)[fn].apply(c, args);
+    }
+    return;
+}
+
+/**
+ * Returns concatenation of function name and arguments array
+ * @param {string} fn Function name
+ * @param {any[]} args Arguments array
+ */
+function getArgs(fn, args) {
+    return [fn].concat(toArr(args));
 }
 
 /**
@@ -106,15 +130,15 @@ function isLoggingAllowed(...args) {
  * @class
  */
 export default class Logger {
-    constructor(config = {}) {
-        this.config = Object.freeze({
+    constructor(config) {
+        config = config || {};
+        this.config = Object.freeze(assign({
             allowedHostnames: ['localhost', '127.0.0.1', '0.0.0.0'],
             disable: false,
             allowedQueryStringParameters: ['debug'],
             allowedPorts: [],
-            prefixes: [],
-            ...config
-        });
+            prefixes: []
+        }, config));
         this.location = typeof window === 'undefined' ? {} : window.location;
         this.URL = this.location.href;
     }
@@ -122,135 +146,69 @@ export default class Logger {
         return isLoggingAllowed.apply(this, args);
     }
     log() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.log) {
-            return console.log(...args);
-        }
+        return rewireFunc.apply(this, getArgs('log', arguments));
     }
     warn() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.warn) {
-            console.warn(...args);
-        }
+        return rewireFunc.apply(this, getArgs('warn', arguments));
     }
     debug() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.debug) {
-            console.debug(...args);
-        }
+        return rewireFunc.apply(this, getArgs('debug', arguments));
     }
     error() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.error) {
-            console.error(...args);
-        }
+        return rewireFunc.apply(this, getArgs('error', arguments));
     }
     info() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.info) {
-            console.info(...args);
-        }
+        return rewireFunc.apply(this, getArgs('info', arguments));
     }
     dir() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.dir) {
-            console.dir(...args);
-        }
+        return rewireFunc.apply(this, getArgs('dir', arguments));
     }
     dirxml() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.dirxml) {
-            console.dirxml(...args);
-        }
+        return rewireFunc.apply(this, getArgs('dirxml', arguments));
     }
     table() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.table) {
-            console.table(...args);
-        }
+        return rewireFunc.apply(this, getArgs('table', arguments));
     }
     trace() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.trace) {
-            console.trace(...args);
-        }
+        return rewireFunc.apply(this, getArgs('trace', arguments));
     }
     group() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.group) {
-            console.group(...args);
-        }
+        return rewireFunc.apply(this, getArgs('group', arguments));
     }
     groupCollapsed() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.groupCollapsed) {
-            console.groupCollapsed(...args);
-        }
+        return rewireFunc.apply(this, getArgs('groupCollapsed', arguments));
     }
     groupEnd() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.groupEnd) {
-            console.groupEnd(...args);
-        }
+        return rewireFunc.apply(this, getArgs('groupEnd', arguments));
     }
     clear() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.clear) {
-            console.clear(...args);
-        }
+        return rewireFunc.apply(this, getArgs('clear', arguments));
     }
     count() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.count) {
-            console.count(...args);
-        }
+        return rewireFunc.apply(this, getArgs('count', arguments));
     }
     countReset() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.countReset) {
-            console.countReset(...args);
-        }
+        return rewireFunc.apply(this, getArgs('countReset', arguments));
     }
     assert() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.assert) {
-            console.assert(...args);
-        }
+        return rewireFunc.apply(this, getArgs('assert', arguments));
     }
     profile() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.profile) {
-            console.profile(...args);
-        }
+        return rewireFunc.apply(this, getArgs('profile', arguments));
     }
     profileEnd() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.profileEnd) {
-            console.profileEnd(...args);
-        }
+        return rewireFunc.apply(this, getArgs('profileEnd', arguments));
     }
     time() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed() && console.time) {
-            console.time(...args);
-        }
+        return rewireFunc.apply(this, getArgs('time', arguments));
     }
     timeLog() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.timeLog) {
-            console.timeLog(...args);
-        }
+        return rewireFunc.apply(this, getArgs('timeLog', arguments));
     }
     timeStamp() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.timeStamp) {
-            console.timeStamp(...args);
-        }
+        return rewireFunc.apply(this, getArgs('timeStamp', arguments));
     }
     context() {
-        const args = [...this.config.prefixes, ...arguments];
-        if (this.isLoggingAllowed(args) && console.context) {
-            console.context(...args);
-        }
+        return rewireFunc.apply(this, getArgs('context', arguments));
     }
 }
