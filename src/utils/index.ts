@@ -1,4 +1,4 @@
-function isObject(ob) {
+function isObject(ob: any): any {
     return ob && typeof ob === 'object';
 }
 
@@ -6,16 +6,8 @@ function isObject(ob) {
  * Returns true if input is an array
  * @param {any[]} arr Any array
  */
-export function isArr(arr) {
+export function isArr(arr?: any[]): boolean {
     return Array.isArray(arr);
-}
-
-/**
- * Converts array like object to proper array
- * @param {any[]} arrayLike Array like object
- */
-export function toArr(arrayLike) {
-    return Array.prototype.slice.call(arrayLike);
 }
 
 /**
@@ -24,7 +16,7 @@ export function toArr(arrayLike) {
  * @param {object} ref Argument object
  * @param {object} target First object
  */
-function loopFunc(ref, target) {
+function loopFunc(ref: any, target: any) {
     if (isObject(ref)) {
         Object.keys(ref).forEach(function (key) {
             target[key] = ref[key];
@@ -37,10 +29,10 @@ function loopFunc(ref, target) {
  * @private
  * @returns {object}
  */
-export function assign() {
-    const target = isObject(arguments[0]) ? arguments[0] : {};
-    for (let i = 1; i < arguments.length; i++) {
-        loopFunc(arguments[i], target);
+export function assign<T>(...args: T[]): T {
+    const target = isObject(args[0]) ? args[0] : {} as T;
+    for (let i = 1; i < args.length; i++) {
+        loopFunc(args[i], target);
     }
     return target;
 }

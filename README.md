@@ -10,12 +10,14 @@ npm i argon-logger
 
 # How it works?
 
-Argon logger exposes the same console API but with control over when and where you want to generate logs. Argon logger uses URL schema to determine whether it should log results or not. By default it enable logs only for ``localhost`` URLs which makes it perfect for production use (caution on the last part though).
+Argon logger allows you to configure ``console`` methods especially if you want to turn off logs for certain web addresses. It's super easy to use.
 
 ## Without configuration
 
+The built-in ``Logger`` class implements five commonly used methods: ``log``, ``debug``, ``warn``, ``error`` and ``info``.
+
 ```js
-import Logger from 'argon-logger';
+import { Logger } from 'argon-logger';
 
 const logger = new Logger();
 
@@ -44,6 +46,68 @@ logger.warn('This is a warning'); // This is a warning
 ...
 ```
 
+# Extending logger API
+
+Argon Logger doesn't implement every ``console`` method out of the box. However, it doesn't stop you from adding new methods to ArgonLogger. To wire-up new methods you need to follow the steps below:
+
+## Step 1
+
+Create a class that extends ``Logger``.
+
+```js
+class MyLogger extends Logger {
+    constructor(config) {
+        super(config);
+    }
+}
+
+const myLoggerInstance = new MyLogger();
+```
+
+## Step 2
+
+Add a valid console method.
+
+```js
+class MyLogger extends Logger {
+    constructor(config) {
+        super(config);
+    }
+    count() { ... }
+}
+...
+```
+
+In order to take advantage of Logger configuration, you need to rewire these methods. There are two ways of doing that:
+
+## Step 3: Re-wire methods using ``rewire``
+
+```js
+class MyLogger extends Logger {
+    constructor(config) {
+        super(config);
+    }
+    count() {
+        this.rewire('count', ...arguments);
+    }
+}
+```
+
+## Step 3: Re-wire using ``autowire`` decorator
+
+Decorators are stage 2 proposal for JavaScript. In order to use ``autowire`` decorator you might need an appropriate babel plugin.
+
+```js
+import { Logger, autowire } from 'argon-logger';
+class MyLogger extends Logger {
+    constructor(config) {
+        super(config);
+    }
+    @autowire
+    count() {}
+}
+```
+
 # Word of caution
 
-This is a minor release and there are no major versions out there yet. It means that it is changing frequently. Use it at your own risk.
+This is a minor release and therefore no major versions are out there yet. Use this release with caution. Feel free to report bugs and submit PRs.

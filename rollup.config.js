@@ -1,8 +1,8 @@
-import resolve from "rollup-plugin-node-resolve";
-import commonjs from "rollup-plugin-commonjs";
-import babel from "rollup-plugin-babel";
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import babel from "@rollup/plugin-babel";
+import json from "@rollup/plugin-json";
 import { terser } from "rollup-plugin-terser";
-import json from "rollup-plugin-json";
 import { eslint } from 'rollup-plugin-eslint';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
@@ -17,11 +17,11 @@ const banner = `/**!
  */`;
 
 const defaultConfig = {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: {
         file: 'dist/js/argonLogger.js',
         format: 'umd',
-        name: 'Logger',
+        name: 'ArgonLogger',
         sourcemap: true,
         banner
     },
@@ -35,9 +35,13 @@ const defaultConfig = {
                 moduleDirectory: "node_modules"
             }
         }),
-        commonjs(),
         babel({
-            exclude: "node_modules/**"
+            exclude: "node_modules/**",
+            extensions: ['.js', '.jsx', '.es6', '.es', '.mjs', '.ts'],
+            babelHelpers: 'bundled'
+        }),
+        commonjs({
+            extensions: ['.js', '.ts']
         })
     ]
 };

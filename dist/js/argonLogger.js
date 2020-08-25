@@ -6,10 +6,10 @@
  * @license MIT
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.Logger = factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.ArgonLogger = {}));
+}(this, (function (exports) { 'use strict';
 
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -49,16 +49,58 @@
     return Constructor;
   }
 
-  if (!Array.prototype.includes) {
-    Array.prototype.includes = function (el) {
-      return this.indexOf(el) > -1;
-    };
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
   }
 
-  if (!Array.prototype.find) {
-    Array.prototype.find = function (cb) {
-      return this.filter(cb)[0];
-    };
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object.keys(descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object.defineProperty(target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function includes(arr, el) {
+    return arr.indexOf(el) > -1;
+  }
+
+  function find(arr, cb) {
+    return arr.filter(function (item, index) {
+      return cb(item, index);
+    })[0];
   }
 
   function isObject(ob) {
@@ -72,14 +114,6 @@
 
   function isArr(arr) {
     return Array.isArray(arr);
-  }
-  /**
-   * Converts array like object to proper array
-   * @param {any[]} arrayLike Array like object
-   */
-
-  function toArr(arrayLike) {
-    return Array.prototype.slice.call(arrayLike);
   }
   /**
    * Inner loop function for assign
@@ -103,26 +137,27 @@
 
 
   function assign() {
-    var target = isObject(arguments[0]) ? arguments[0] : {};
+    var target = isObject(arguments.length <= 0 ? undefined : arguments[0]) ? arguments.length <= 0 ? undefined : arguments[0] : {};
 
     for (var i = 1; i < arguments.length; i++) {
-      loopFunc(arguments[i], target);
+      loopFunc(i < 0 || arguments.length <= i ? undefined : arguments[i], target);
     }
 
     return target;
   }
+
+  var _class, _temp;
 
   /**
    * Tests if current host name matches allowed hostnames
    * @param {string} hostname Current hostname
    * @param {object} config Configuration
    */
-
   function matchesURL(hostname, config) {
     var allowedHostnames = isArr(config.allowedHostnames) ? config.allowedHostnames : [];
-    return allowedHostnames.length === 0 || !!allowedHostnames.find(function (URL) {
-      return URL.includes(hostname);
-    });
+    return allowedHostnames.length === 0 || Boolean(find(allowedHostnames, function (URL) {
+      return includes(URL, hostname);
+    }));
   }
   /**
    * Checks if given port is allowed
@@ -136,7 +171,7 @@
     allowedPorts = allowedPorts.map(function (port) {
       return "".concat(port).trim();
     });
-    return allowedPorts.length === 0 || allowedPorts.includes(port);
+    return allowedPorts.length === 0 || includes(allowedPorts, port);
   }
   /**
    * Returns a map of query string key value pairs
@@ -145,7 +180,7 @@
 
 
   function getAllParams(queryString) {
-    queryString = queryString.substring(queryString.charAt(0) === '?');
+    queryString = queryString.substring(Number(queryString.charAt(0) === '?'));
     return queryString.split('&').map(function (pairs) {
       var pair = pairs.split('=').map(function (part) {
         return decodeURIComponent(part).trim();
@@ -177,7 +212,7 @@
     var allowedQueryStringParameters = isArr(config.allowedQueryStringParameters) ? config.allowedQueryStringParameters : [];
     var allParams = getAllParams(queryString);
     var allowedParams = [];
-    allowedQueryStringParameters.forEach(function (param) {
+    allowedQueryStringParameters === null || allowedQueryStringParameters === void 0 ? void 0 : allowedQueryStringParameters.forEach(function (param) {
       if (typeof param === 'string') {
         var pair = param.split('=');
         allowedParams.push({
@@ -193,9 +228,9 @@
     });
     var result = false;
     allowedParams.forEach(function (param) {
-      var currentResult = !!allParams.find(function (queryParam) {
+      var currentResult = Boolean(find(allParams, function (queryParam) {
         return param.key === queryParam.key && (param.value === queryParam.value || param.value === true);
-      });
+      }));
       result = result || currentResult;
     });
     return result;
@@ -211,44 +246,66 @@
     var location = this.location;
 
     if (typeof test === 'function') {
-      return test.apply(this.config, arguments);
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return test.apply(this.config, args);
     }
 
     return typeof console !== 'undefined' && (matchesURL(location.hostname, this.config) && matchesPort(location.port, this.config) || matchesQueryParam(location.search, this.config)) && !disable;
   }
 
   function rewireFunc() {
-    var args = toArr(arguments);
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
     var fn = args.splice(0, 1)[0];
     var prefixes = this.config.prefixes;
     args = prefixes.concat(args);
 
     if (this.isLoggingAllowed(args) && console[fn]) {
       var c;
-      return (c = console)[fn].apply(c, args);
+      (c = console)[fn].apply(c, args);
+    }
+  }
+
+  function autowire(_, propertyName, desc) {
+    if (!(propertyName in console)) {
+      throw new Error("Invalid console method: \"".concat(propertyName, "\""));
     }
 
-    return;
-  }
-  /**
-   * Returns concatenation of function name and arguments array
-   * @param {string} fn Function name
-   * @param {any[]} args Arguments array
-   */
+    return {
+      configurable: true,
+      enumerable: false,
+      get: function get() {
+        var self = this;
+        return function () {
+          for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+          }
 
-
-  function getArgs(fn, args) {
-    return [fn].concat(toArr(args));
+          desc.value.apply(self, args);
+          rewireFunc.apply(self, [propertyName].concat(args));
+        }.bind(this);
+      }
+    };
   }
   /**
    * Logger class
    * @class
    */
 
-
-  var Logger = /*#__PURE__*/function () {
+  var Logger = (_class = (_temp = /*#__PURE__*/function () {
     function Logger(config) {
       _classCallCheck(this, Logger);
+
+      _defineProperty(this, "config", void 0);
+
+      _defineProperty(this, "location", void 0);
+
+      _defineProperty(this, "URL", void 0);
 
       config = config || {};
       this.config = Object.freeze(assign({
@@ -268,121 +325,43 @@
         return _isLoggingAllowed.apply(this, args);
       }
     }, {
-      key: "log",
-      value: function log() {
-        return rewireFunc.apply(this, getArgs('log', arguments));
+      key: "rewire",
+      value: function rewire(method) {
+        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+          args[_key4 - 1] = arguments[_key4];
+        }
+
+        rewireFunc.apply(this.self, [method].concat(args));
       }
+    }, {
+      key: "log",
+      value: function log() {}
     }, {
       key: "warn",
-      value: function warn() {
-        return rewireFunc.apply(this, getArgs('warn', arguments));
-      }
+      value: function warn() {}
     }, {
       key: "debug",
-      value: function debug() {
-        return rewireFunc.apply(this, getArgs('debug', arguments));
-      }
+      value: function debug() {}
     }, {
       key: "error",
-      value: function error() {
-        return rewireFunc.apply(this, getArgs('error', arguments));
-      }
+      value: function error() {}
     }, {
       key: "info",
-      value: function info() {
-        return rewireFunc.apply(this, getArgs('info', arguments));
-      }
+      value: function info() {}
     }, {
-      key: "dir",
-      value: function dir() {
-        return rewireFunc.apply(this, getArgs('dir', arguments));
-      }
-    }, {
-      key: "dirxml",
-      value: function dirxml() {
-        return rewireFunc.apply(this, getArgs('dirxml', arguments));
-      }
-    }, {
-      key: "table",
-      value: function table() {
-        return rewireFunc.apply(this, getArgs('table', arguments));
-      }
-    }, {
-      key: "trace",
-      value: function trace() {
-        return rewireFunc.apply(this, getArgs('trace', arguments));
-      }
-    }, {
-      key: "group",
-      value: function group() {
-        return rewireFunc.apply(this, getArgs('group', arguments));
-      }
-    }, {
-      key: "groupCollapsed",
-      value: function groupCollapsed() {
-        return rewireFunc.apply(this, getArgs('groupCollapsed', arguments));
-      }
-    }, {
-      key: "groupEnd",
-      value: function groupEnd() {
-        return rewireFunc.apply(this, getArgs('groupEnd', arguments));
-      }
-    }, {
-      key: "clear",
-      value: function clear() {
-        return rewireFunc.apply(this, getArgs('clear', arguments));
-      }
-    }, {
-      key: "count",
-      value: function count() {
-        return rewireFunc.apply(this, getArgs('count', arguments));
-      }
-    }, {
-      key: "countReset",
-      value: function countReset() {
-        return rewireFunc.apply(this, getArgs('countReset', arguments));
-      }
-    }, {
-      key: "assert",
-      value: function assert() {
-        return rewireFunc.apply(this, getArgs('assert', arguments));
-      }
-    }, {
-      key: "profile",
-      value: function profile() {
-        return rewireFunc.apply(this, getArgs('profile', arguments));
-      }
-    }, {
-      key: "profileEnd",
-      value: function profileEnd() {
-        return rewireFunc.apply(this, getArgs('profileEnd', arguments));
-      }
-    }, {
-      key: "time",
-      value: function time() {
-        return rewireFunc.apply(this, getArgs('time', arguments));
-      }
-    }, {
-      key: "timeLog",
-      value: function timeLog() {
-        return rewireFunc.apply(this, getArgs('timeLog', arguments));
-      }
-    }, {
-      key: "timeStamp",
-      value: function timeStamp() {
-        return rewireFunc.apply(this, getArgs('timeStamp', arguments));
-      }
-    }, {
-      key: "context",
-      value: function context() {
-        return rewireFunc.apply(this, getArgs('context', arguments));
+      key: "self",
+      get: function get() {
+        return this;
       }
     }]);
 
     return Logger;
-  }();
+  }(), _temp), (_applyDecoratedDescriptor(_class.prototype, "log", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "log"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "warn", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "warn"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "debug", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "debug"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "error", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "error"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "info", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "info"), _class.prototype)), _class);
 
-  return Logger;
+  exports.Logger = Logger;
+  exports.autowire = autowire;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 //# sourceMappingURL=argonLogger.js.map
