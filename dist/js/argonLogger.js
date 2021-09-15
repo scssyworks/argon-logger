@@ -146,7 +146,7 @@
     return target;
   }
 
-  var _class, _temp;
+  var _class;
 
   /**
    * Tests if current host name matches allowed hostnames
@@ -221,10 +221,10 @@
         });
       } else if (param && _typeof(param) === 'object' && hasOwn(param, 'key') && hasOwn(param, 'value') // Schema check
       ) {
-          param.key = param.key.trim();
-          param.value = "".concat(param.value).trim();
-          allowedParams.push(param);
-        }
+        param.key = param.key.trim();
+        param.value = "".concat(param.value).trim();
+        allowedParams.push(param);
+      }
     });
     var result = false;
     allowedParams.forEach(function (param) {
@@ -256,17 +256,19 @@
     return typeof console !== 'undefined' && (matchesURL(location.hostname, this.config) && matchesPort(location.port, this.config) || matchesQueryParam(location.search, this.config)) && !disable;
   }
 
-  function rewireFunc() {
-    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+  function rewireFunc(fn) {
+    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
     }
 
-    var fn = args.splice(0, 1)[0];
     var prefixes = this.config.prefixes;
-    args = prefixes.concat(args);
+    args = prefixes.concat(args); // eslint-disable-next-line
+    // @ts-ignore
 
     if (this.isLoggingAllowed(args) && console[fn]) {
-      var c;
+      var c; // eslint-disable-next-line
+      // @ts-ignore
+
       (c = console)[fn].apply(c, args);
     }
   }
@@ -297,7 +299,7 @@
    * @class
    */
 
-  var Logger = (_class = (_temp = /*#__PURE__*/function () {
+  var Logger = (_class = /*#__PURE__*/function () {
     function Logger(config) {
       _classCallCheck(this, Logger);
 
@@ -320,6 +322,11 @@
     }
 
     _createClass(Logger, [{
+      key: "self",
+      get: function get() {
+        return this;
+      }
+    }, {
       key: "isLoggingAllowed",
       value: function isLoggingAllowed(args) {
         return _isLoggingAllowed.apply(this, args);
@@ -348,15 +355,10 @@
     }, {
       key: "info",
       value: function info() {}
-    }, {
-      key: "self",
-      get: function get() {
-        return this;
-      }
     }]);
 
     return Logger;
-  }(), _temp), (_applyDecoratedDescriptor(_class.prototype, "log", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "log"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "warn", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "warn"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "debug", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "debug"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "error", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "error"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "info", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "info"), _class.prototype)), _class);
+  }(), (_applyDecoratedDescriptor(_class.prototype, "log", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "log"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "warn", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "warn"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "debug", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "debug"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "error", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "error"), _class.prototype), _applyDecoratedDescriptor(_class.prototype, "info", [autowire], Object.getOwnPropertyDescriptor(_class.prototype, "info"), _class.prototype)), _class);
 
   exports.Logger = Logger;
   exports.autowire = autowire;
