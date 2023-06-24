@@ -1,113 +1,114 @@
-# Argon logger [![Build Status](https://travis-ci.org/scssyworks/argon-logger.svg?branch=master)](https://travis-ci.org/scssyworks/argon-logger)
+# Argon logger
 
-A ``console`` logger that you can control.
+Argon Logger is a powerful tool built to enhance and surpass the traditional
+`console.log(...)` functionality. It provides comprehensive control over the
+output of your logs, allowing you to customize their behavior according to your
+specific needs.
 
-# Installation
+With Argon Logger, you can seamlessly replace `console.log(...)` with a more
+flexible and versatile logging solution. You gain the ability to determine
+exactly how your logs should be handled, giving you greater control over their
+visibility and destination.
+
+In production environments, security is paramount. Argon Logger offers the
+option to suppress logs entirely, ensuring that sensitive information remains
+hidden from prying eyes. You can rest assured that your logs won't inadvertently
+expose critical data.
+
+Additionally, Argon Logger allows you to redirect logs to alternative
+destinations beyond the default `console`. This flexibility enables you to
+capture logs in various contexts, such as storing them in a file, sending them
+to a remote server, or integrating them with a dedicated logging service. The
+choice is yours, and Argon Logger empowers you to tailor the log output to suit
+your specific requirements.
+
+By leveraging Argon Logger, you can elevate your logging capabilities, enhance
+security, and achieve greater flexibility in handling log messages. Say goodbye
+to the limitations of `console.log(...)` and unlock a new level of control and
+customization with Argon Logger.
+
+# Install
 
 ```sh
 npm i argon-logger
 ```
 
-# How it works?
+## Usage
 
-Argon logger allows you to configure ``console`` methods especially if you want to turn off logs for certain web addresses. It's super easy to use.
-
-## Without configuration
-
-The built-in ``Logger`` class implements five commonly used methods: ``log``, ``debug``, ``warn``, ``error`` and ``info``.
+Argon Logger provides a familiar interface that closely resembles the widely
+used `console` object. You can seamlessly integrate it into your codebase and
+start leveraging its enhanced logging capabilities. Here's an example showcasing
+how to use Argon Logger:
 
 ```js
-import { Logger } from 'argon-logger';
+import { logger } from "argon-logger";
 
-const logger = new Logger();
-
-logger.log('Hello'); // -> Hello
-logger.warn('This is a warning'); // -> This is a warning
-logger.error('This is an error'); // -> This is an error
-logger.debug('This is a debug message'); // -> This is a debug message
-...
+logger.log("Hello"); // Output: Hello
+logger.warn("This is a warning"); // Output: This is a warning
+logger.error("This is an error"); // Output: This is an error
+logger.debug("This is a debug message"); // Output: This is a debug message
+logger.info("This is an info message"); // Output: This is an info message
 ```
 
-## With configuration
+As you can see, using Argon Logger is similar to utilizing regular `console`
+methods. You can call `logger.log(...)`, `logger.warn(...)`,
+`logger.error(...)`, `logger.debug(...)`, and `logger.info(...)` to log messages
+of different severity levels.
+
+However, what sets Argon Logger apart is its intelligent filtering and
+customization capabilities. By default, it offers a concise set of API methods
+to ensure a compact library size. It also limits log visibility to the
+`localhost` environment, which enhances security by preventing logs from being
+exposed in production environments.
+
+Moreover, Argon Logger provides the flexibility to extend its API and modify
+restriction levels. Consider the following example:
 
 ```js
-const logger = new Logger({
-    allowedHostnames: ['google.com'], // List of hostnames allowed. Set this to an empty array to allow logs everywhere.
-    allowedQueryStringParameters: ['debug=true'], // List of query string parameters for which logs should be generated.
-    allowedPorts: [], // List of ports for which logging should be enabled
-    test: (...logArguments) => { ... }, // A test function for full flexibility on customizing where to hide the logs
-                         // A test function overrides existing filters.
-    prefixes: [], // Array of strings to be prepended automatically before each log.
-    disable: false // If set to "true" disables the logging completely. The remaining two parameters are ignored.
+import { autowire, Logger } from "argon-logger";
+
+class MyLogger extends Logger {
+  constructor(config) {
+    super(config);
+  }
+
+  @autowire() // Automatically wires "console" method if the API supports it
+  time() {}
+
+  @autowire()
+  timeEnd() {}
+
+  customLogMethod(...args) {
+    this.api.log(...args);
+  }
+}
+
+const logger = new MyLogger({
+  api: console, // The default api is "console"
+  disable: location.hostname !== "localhost",
 });
 
-logger.log('Hello'); // Hello
-logger.warn('This is a warning'); // This is a warning
-...
+logger.time("Timer");
+// ...
+logger.timeEnd("Timer");
+logger.customLogMethod("Custom method");
 ```
 
-# Extending logger API
+In this example, a custom logger class, MyLogger, extends the base Logger class
+from Argon Logger. It introduces additional methods such as `time()`,
+`timeEnd()`, and `customLogMethod()`. The `@autowire()` decorator automatically
+wires the corresponding methods from the API if supported. By customizing the
+logger, you can tailor it to your specific needs.
 
-Argon Logger doesn't implement every ``console`` method out of the box. However, it doesn't stop you from adding new methods to ArgonLogger. To wire-up new methods you need to follow the steps below:
+With Argon Logger, you gain not only the simplicity and familiarity of
+`console`-like methods but also the ability to fine-tune and extend its
+functionality to suit your requirements. Empower your logging experience with
+Argon Logger and unlock its powerful customization options.
 
-## Step 1
+# Contributing
 
-Create a class that extends ``Logger``.
-
-```js
-class MyLogger extends Logger {
-    constructor(config) {
-        super(config);
-    }
-}
-
-const myLoggerInstance = new MyLogger();
-```
-
-## Step 2
-
-Add a valid console method.
-
-```js
-class MyLogger extends Logger {
-    constructor(config) {
-        super(config);
-    }
-    count() { ... }
-}
-...
-```
-
-In order to take advantage of Logger configuration, you need to rewire these methods. There are two ways of doing that:
-
-## Step 3: Re-wire methods using ``rewire``
-
-```js
-class MyLogger extends Logger {
-    constructor(config) {
-        super(config);
-    }
-    count() {
-        this.rewire('count', ...arguments);
-    }
-}
-```
-
-## Step 3: Re-wire using ``autowire`` decorator
-
-Decorators are stage 2 proposal for JavaScript. In order to use ``autowire`` decorator you might need an appropriate babel plugin.
-
-```js
-import { Logger, autowire } from 'argon-logger';
-class MyLogger extends Logger {
-    constructor(config) {
-        super(config);
-    }
-    @autowire
-    count() {}
-}
-```
-
-# Word of caution
-
-This is a minor release and therefore no major versions are out there yet. Use this release with caution. Feel free to report bugs and submit PRs.
+We welcome contributions from the community to enhance the plugin's
+functionality and address any issues. If you have any feedback, bug reports, or
+feature requests, please don't hesitate to
+[open an issue](https://github.com/scssyworks/argon-logger/issues) or submit a
+pull request on GitHub.
