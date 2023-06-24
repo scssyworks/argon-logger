@@ -13,12 +13,14 @@
   "author": "Sachin Singh <contactsachinsingh@gmail.com>",
   "license": "MIT",
   "keywords": [
-    "logger",
     "console",
-    "logs",
-    "hide-logs",
+    "log",
+    "logger",
     "logging",
-    "api"
+    "api",
+    "rollup",
+    "security",
+    "rollup-scripts"
   ],
   "repository": {
     "type": "git",
