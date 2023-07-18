@@ -7,7 +7,7 @@
   "types": "dist/typings/index.d.ts",
   "scripts": {
     "lint": "rollup-scripts lint",
-    "build": "npm run typegen && rollup-scripts build",
+    "build": "npm run typegen && rollup-scripts build --swc",
     "typegen": "tsc --declaration --noEmit false --outDir dist/typings/ --emitDeclarationOnly --declarationMap"
   },
   "author": "Sachin Singh <contactsachinsingh@gmail.com>",
@@ -37,6 +37,6 @@
     "LICENSE"
   ],
   "devDependencies": {
-    "rollup-scripts": "0.0.89"
+    "rollup-scripts": "0.0.105"
   }
 }
