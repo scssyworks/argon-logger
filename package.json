@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "rollup-scripts lint",
     "build": "npm run typegen && rollup-scripts build --swc",
-    "typegen": "tsc --declaration --noEmit false --outDir dist/typings/ --emitDeclarationOnly --declarationMap"
+    "typegen": "tsc --declaration --noEmit false --outDir dist/typings/ --emitDeclarationOnly --declarationMap",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "author": "Sachin Singh <contactsachinsingh@gmail.com>",
   "license": "MIT",
