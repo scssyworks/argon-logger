@@ -1,6 +1,6 @@
 {
   "name": "argon-logger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple console logging utility",
   "main": "dist/cjs/logger.js",
   "module": "dist/esm/logger.mjs",
@@ -32,7 +32,12 @@
     "url": "https://github.com/scssyworks/argon-logger/issues"
   },
   "homepage": "https://github.com/scssyworks/argon-logger#readme",
-  "files": ["dist/cjs/", "dist/mjs/", "dist/typings/", "LICENSE"],
+  "files": [
+    "dist/cjs/",
+    "dist/mjs/",
+    "dist/typings/",
+    "LICENSE"
+  ],
   "devDependencies": {
     "rollup-scripts": "0.0.116",
     "rome": "12.1.3"
