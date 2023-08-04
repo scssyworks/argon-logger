@@ -9,16 +9,28 @@ type LoggerFunction = (...args: any[]) => void;
 type FormatterFunction = (...args: any[]) => any;
 
 enum Env {
-  NODE = "node",
-  BROWSER = "browser",
-  UNKNOWN = "unknown",
+  NODE = 'node',
+  BROWSER = 'browser',
+  UNKNOWN = 'unknown',
+}
+
+function merge<U>(
+  defaultConfig: Config<Console>,
+  config: Config<U>
+): Config<Console | U> {
+  return {
+    api: config.api ?? defaultConfig.api,
+    disable: config.disable ?? defaultConfig.disable,
+    prefixes: config.prefixes ?? defaultConfig.prefixes,
+    test: config.test,
+  };
 }
 
 function checkEnv() {
-  if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     return Env.NODE;
   }
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     return Env.BROWSER;
   }
   return Env.UNKNOWN;
@@ -27,13 +39,13 @@ function checkEnv() {
 function shouldDisable() {
   switch (checkEnv()) {
     case Env.NODE:
-      return typeof process !== "undefined" &&
-        process.env?.NODE_ENV === "production";
-    case Env.BROWSER:
-      return !["localhost", "127.0.0.1", "0.0.0.0"].includes(
-        window.location.hostname,
+      return (
+        typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
       );
-    case Env.UNKNOWN:
+    case Env.BROWSER:
+      return !['localhost', '127.0.0.1', '0.0.0.0'].includes(
+        window.location.hostname
+      );
     default:
       return true;
   }
@@ -46,8 +58,8 @@ function rewire(
 ): void {
   const { api, prefixes } = this.config;
   args = prefixes.concat(args);
-  if (this.allowed(...args)) {
-    if (typeof formatter === "function") {
+  if (fn in api && this.allowed(...args)) {
+    if (typeof formatter === 'function') {
       const out = formatter(...args);
       api[fn](out);
     } else {
@@ -59,12 +71,9 @@ function rewire(
 export function autowire(customFormatter?: FormatterFunction) {
   return function (
     originalFunc: LoggerFunction,
-    { kind, name }: { kind: string; name: string },
+    { kind, name }: { kind: string; name: string }
   ): LoggerFunction | void {
-    if (kind === "method") {
-      if (!(name in console)) {
-        throw new Error(`Invalid console method: "${name}"`);
-      }
+    if (kind === 'method') {
       return function (...args: any[]) {
         originalFunc.apply(this, args);
         rewire.apply(this, [name, customFormatter, ...args]);
@@ -78,30 +87,36 @@ export function autowire(customFormatter?: FormatterFunction) {
  * @class
  */
 export class Logger<T = Console> {
-  config: Config<T>;
-  api: T;
+  config: Config<T | Console>;
   constructor(config?: Config<T>) {
     config = config || ({} as Config<T>);
     this.config = Object.freeze(
-      Object.assign(
+      merge<T>(
         {
           api: console,
           disable: false,
           prefixes: [],
         },
-        config,
-      ),
+        config
+      )
     );
-    this.api = this.config.api as T;
+  }
+  get api(): T {
+    return this.config.api as T;
   }
   allowed(...args: any[]): boolean {
     const conf = this.config;
-    if (typeof conf.test === "function") {
+    if (typeof conf.test === 'function') {
       return conf.test.apply(this, args);
     }
     return !conf.disable;
   }
+}
 
+export class ConsoleLogger extends Logger<Console> {
+  constructor(config: Omit<Config<Console>, 'api'>) {
+    super({ ...config, api: console }); // API always stays console
+  }
   @autowire()
   log(): void {}
   @autowire()
@@ -114,6 +129,6 @@ export class Logger<T = Console> {
   info(): void {}
 }
 
-export const logger = new Logger<Console>({
+export const logger = new ConsoleLogger({
   disable: shouldDisable(),
 });

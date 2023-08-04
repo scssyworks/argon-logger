@@ -7,9 +7,10 @@
   "types": "dist/typings/index.d.ts",
   "scripts": {
     "lint": "rollup-scripts lint",
-    "build": "npm run typegen && rollup-scripts build --swc",
+    "build": "npm run typegen && rollup-scripts build",
     "typegen": "tsc --declaration --noEmit false --outDir dist/typings/ --emitDeclarationOnly --declarationMap",
-    "prepublishOnly": "npm run lint && npm run build"
+    "prepublishOnly": "npm run lint && npm run build",
+    "rome:checks": "rome check ./ && rome format ./"
   },
   "author": "Sachin Singh <contactsachinsingh@gmail.com>",
   "license": "MIT",
@@ -31,13 +32,9 @@
     "url": "https://github.com/scssyworks/argon-logger/issues"
   },
   "homepage": "https://github.com/scssyworks/argon-logger#readme",
-  "files": [
-    "dist/cjs/",
-    "dist/mjs/",
-    "dist/typings/",
-    "LICENSE"
-  ],
+  "files": ["dist/cjs/", "dist/mjs/", "dist/typings/", "LICENSE"],
   "devDependencies": {
-    "rollup-scripts": "0.0.105"
+    "rollup-scripts": "0.0.116",
+    "rome": "12.1.3"
   }
 }
