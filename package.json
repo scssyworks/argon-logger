@@ -32,14 +32,9 @@
     "url": "https://github.com/scssyworks/argon-logger/issues"
   },
   "homepage": "https://github.com/scssyworks/argon-logger#readme",
-  "files": [
-    "dist/cjs/",
-    "dist/mjs/",
-    "dist/typings/",
-    "LICENSE"
-  ],
+  "files": ["dist/cjs/", "dist/mjs/", "dist/typings/", "LICENSE"],
   "devDependencies": {
-    "rollup-scripts": "0.0.116",
+    "rollup-scripts": "0.0.117",
     "rome": "12.1.3"
   }
 }

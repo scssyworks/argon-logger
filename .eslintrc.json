@@ -20,14 +20,14 @@
     "plugin:import/typescript",
     "plugin:@typescript-eslint/recommended"
   ],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "off"
-  },
   "parser": "@typescript-eslint/parser",
   "settings": {
     "import/resolver": {
       "typescript": true,
       "node": true
     }
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }
